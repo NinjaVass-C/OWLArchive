@@ -1,7 +1,34 @@
 <template>
   <div>
-    <h1>Vue + Axios Test</h1>
-    <p>{{ message }}</p>
+    <h1>Match Results</h1>
+
+    <!-- Dropdown for Team One -->
+    <label for="teamOne">Select Team One:</label>
+    <select v-model="selectedTeamOne" id="teamOne">
+      <option v-for="team in teams" :key="team.team_name" :value="team.team_name">
+        {{ team.team_name }}
+      </option>
+    </select>
+
+    <!-- Dropdown for Team Two -->
+    <label for="teamTwo">Select Team Two:</label>
+    <select v-model="selectedTeamTwo" id="teamTwo">
+      <option v-for="team in teams" :key="team.team_name" :value="team.team_name">
+        {{ team.team_name }}
+      </option>
+    </select>
+
+    <!-- Button to Fetch Matches -->
+    <button @click="fetchMatches" :disabled="!selectedTeamOne || !selectedTeamTwo">
+      Get Matches
+    </button>
+
+    <!-- Display Match Results -->
+    <ul v-if="matches.length">
+      <li v-for="match in matches" :key="match.id">
+        {{match.stage }} - {{ match.team_one_name }} vs {{ match.team_two_name }} - Score: {{ match.score_team_one }} - {{ match.score_team_two }}
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -10,19 +37,34 @@ import axios from 'axios';
 
 export default {
   data() {
-    return {
-      message: '', // We will store the "Hello World" message here
-    };
-  },
+    return{
+    selectedTeamOne: null,
+    selectedTeamTwo: null,
+    teams: [],
+    matches: [],
+  };
+},
   mounted() {
-    // Make a GET request to the Express API when the component is mounted
-    axios.get('http://localhost:3000/')
-      .then((response) => {
-        this.message = response.data.message;  // Store the response message
-      })
-      .catch((error) => {
-        console.error('There was an error fetching the data:', error);
-      });
+    this.fetchTeams();
   },
+  methods:{
+  async fetchTeams(){
+    try{
+      const response = await axios.get(`http://localhost:3000/teams`);
+      this.teams = response.data
+    } catch (err){
+      console.error(err);
+    }
+
+  },
+  async fetchMatches(){
+    try{
+      const response = await axios.get(`http://localhost:3000/matches/${this.selectedTeamOne}/${this.selectedTeamTwo}`);
+      this.matches = response.data;  
+    } catch (err){
+      console.error(err);
+    }
+  }
+  }
 };
 </script>

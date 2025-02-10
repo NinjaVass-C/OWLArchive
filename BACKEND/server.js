@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const port = 3000;
+var indexRouter = require('./routes/index.js');
+
 
 app.use(express.json());
 app.use(cors({
@@ -9,9 +11,7 @@ app.use(cors({
     methods: ['GET', 'POST'],
   }));
 
-app.get('/', (req, res)=> {
-    res.json({message: 'Hello, World!'});
-});
+app.use('/',indexRouter)
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
